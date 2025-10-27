@@ -214,19 +214,19 @@ export default function Index() {
 	};
 
 	return (
-		<div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
-			<div className="container mx-auto px-4 py-8">
+		<div className="min-h-screen bg-linear-to-br from-gray-400 via-gray-700 to-gray-900 text-white">
+			<div className="container mx-auto px-4 py-4">
 				{/* ヘッダー */}
-				<header className="text-center mb-12">
-					<h1 className="text-4xl md:text-6xl font-bold mb-4 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+				<header className="text-center mb-6">
+					<h1 className="text-4xl md:text-6xl font-bold bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
 						AIお絵描き選手権
 					</h1>
-					<p className="text-gray-400 text-lg">
+					{/* <p className="text-gray-400 text-lg">
 						あなたのお気に入りのAI作品に投票しよう！
-					</p>
+					</p> */}
 
 					{/* WebSocket接続インジケーター */}
-					<div className="mt-4 flex items-center justify-center gap-2 text-sm">
+					{/* <div className="mt-4 flex items-center justify-center gap-2 text-sm">
 						<div
 							className={`w-2 h-2 rounded-full ${
 								wsConnected ? "bg-green-500" : "bg-gray-500"
@@ -235,27 +235,27 @@ export default function Index() {
 						<span className="text-gray-500">
 							{wsConnected ? "リアルタイム接続中" : "接続待機中"}
 						</span>
-					</div>
+					</div> */}
 
 					{/* エラーメッセージ表示 */}
-					{error && (
+					{/* {error && (
 						<div className="mt-4 bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg max-w-md mx-auto">
 							{error}
 						</div>
-					)}
+					)} */}
 
 					{/* 投票済みメッセージ */}
 					{votedAi && (
-						<div className="mt-4 bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg max-w-md mx-auto">
+						<div className="mt-1 bg-green-500/20 border border-green-500 text-green-200 px-4 py-3 rounded-lg max-w-md mx-auto">
 							{votedAi} に投票済みです！
 						</div>
 					)}
 				</header>
 
 				{/* テーマ画像表示エリア */}
-				<section className="mb-12">
-					<div className="bg-gray-800 rounded-lg p-6 shadow-xl">
-						<h2 className="text-2xl font-bold mb-4 text-center">お題</h2>
+				<section className="mb-6 flex justify-center">
+					<div className="bg-gray-800 rounded-lg p-6 w-1/3 shadow-xl">
+						<h2 className="text-2xl font-bold mb-2 text-center">お題</h2>
 						<div className="flex justify-center">
 							<img
 								src="/theme.png"
@@ -267,7 +267,7 @@ export default function Index() {
 				</section>
 
 				{/* AI作品表示エリア */}
-				<section className="mb-12">
+				<section className="mb-6">
 					<h2 className="text-2xl font-bold mb-6 text-center">AI作品</h2>
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 						{aiArtists.map((artist) => (
