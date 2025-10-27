@@ -254,7 +254,7 @@ export default function Index() {
 
 				{/* テーマ画像表示エリア */}
 				<section className="mb-6 flex justify-center">
-					<div className="bg-gray-800 rounded-lg p-6 w-1/3 shadow-xl">
+					<div className="bg-gray-800 rounded-lg p-6 w-full md:w-1/3 shadow-xl">
 						<h2 className="text-2xl font-bold mb-2 text-center">お題</h2>
 						<div className="flex justify-center">
 							<img
