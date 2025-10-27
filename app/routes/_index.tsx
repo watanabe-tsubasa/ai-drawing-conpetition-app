@@ -214,11 +214,11 @@ export default function Index() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+		<div className="min-h-screen bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
 			<div className="container mx-auto px-4 py-8">
 				{/* ヘッダー */}
 				<header className="text-center mb-12">
-					<h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+					<h1 className="text-4xl md:text-6xl font-bold mb-4 bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
 						AIお絵描き選手権
 					</h1>
 					<p className="text-gray-400 text-lg">
