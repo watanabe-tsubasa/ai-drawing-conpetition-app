@@ -1,4 +1,6 @@
 export class VoteRoomDO {
+	private state: DurableObjectState;
+	private env: Env;
 	private sessions: WebSocket[] = [];
 
 	constructor(state: DurableObjectState, env: Env) {

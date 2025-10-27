@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { ClientOnly } from "~/components/ClientOnly";
 import type { VoteCounts, VoteMessage } from "~/lib/types";
-import type { Route } from "./+types/_index";
+import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 
 const P5Canvas = lazy(() => import("~/components/P5Canvas"));
 
@@ -15,16 +15,12 @@ export function meta() {
 	];
 }
 
-// loaderで初期投票データを取得
-export async function loader({ request }: Route.LoaderArgs) {
+// loaderで初期投票データを取得（self fetch を回避）
+export async function loader({ context }: LoaderFunctionArgs) {
 	try {
-		const url = new URL(request.url);
-		const apiUrl = `${url.origin}/api/votes`;
-		const response = await fetch(apiUrl);
-		if (!response.ok) {
-			throw new Error("Failed to fetch votes");
-		}
-		const votes = await response.json();
+		// context.api を使って直接 API 関数を呼び出す
+		const votes = await context.api.getVotes();
+		console.log("votes:", votes);
 		return { votes };
 	} catch (error) {
 		console.error("Error fetching votes:", error);
@@ -32,7 +28,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 }
 
-export default function Index({ loaderData }: Route.ComponentProps) {
+export default function Index() {
+  const initialVote = useLoaderData<typeof loader>();
+  console.log(initialVote);
 	const aiArtists = [
 		{ name: "Codex" as const, color: "bg-blue-500", sketchName: "codexSketch" },
 		{
@@ -48,7 +46,7 @@ export default function Index({ loaderData }: Route.ComponentProps) {
 	];
 
 	const [votes, setVotes] = useState<VoteCounts>(
-		loaderData?.votes || { Codex: 0, Claude: 0, Gemini: 0 },
+		initialVote?.votes || { Codex: 0, Claude: 0, Gemini: 0 },
 	);
 	const [votedAi, setVotedAi] = useState<string | null>(null);
 	const [showResults, setShowResults] = useState(false);
@@ -76,6 +74,9 @@ export default function Index({ loaderData }: Route.ComponentProps) {
 
 		let ws: WebSocket | null = null;
 		let reconnectTimeout: number | null = null;
+		let reconnectAttempts = 0;
+		const maxReconnectAttempts = 10;
+		const baseReconnectDelay = 1000; // 1秒
 
 		const connect = () => {
 			try {
@@ -84,6 +85,7 @@ export default function Index({ loaderData }: Route.ComponentProps) {
 				ws.onopen = () => {
 					console.log("WebSocket connected");
 					setWsConnected(true);
+					reconnectAttempts = 0; // リセット
 				};
 
 				ws.onmessage = (event) => {
@@ -111,19 +113,45 @@ export default function Index({ loaderData }: Route.ComponentProps) {
 					setWsConnected(false);
 				};
 
-				ws.onclose = () => {
-					console.log("WebSocket disconnected");
+				ws.onclose = (event) => {
+					console.log("WebSocket disconnected", event.code, event.reason);
 					setWsConnected(false);
 
-					// 5秒後に再接続を試みる
-					reconnectTimeout = setTimeout(() => {
-						console.log("Attempting to reconnect WebSocket...");
-						connect();
-					}, 5000);
+					// 最大再接続試行回数に達していない場合は再接続
+					if (reconnectAttempts < maxReconnectAttempts) {
+						reconnectAttempts++;
+						// エクスポネンシャルバックオフ: 1秒、2秒、4秒...最大32秒
+						const delay = Math.min(
+							baseReconnectDelay * Math.pow(2, reconnectAttempts - 1),
+							32000,
+						);
+						console.log(
+							`Attempting to reconnect in ${delay}ms (attempt ${reconnectAttempts}/${maxReconnectAttempts})...`,
+						);
+						reconnectTimeout = setTimeout(() => {
+							connect();
+						}, delay);
+					} else {
+						console.error(
+							"Max reconnection attempts reached. Please refresh the page.",
+						);
+					}
 				};
 			} catch (err) {
 				console.error("Error creating WebSocket:", err);
 				setWsConnected(false);
+
+				// 接続作成エラーの場合も再試行
+				if (reconnectAttempts < maxReconnectAttempts) {
+					reconnectAttempts++;
+					const delay = Math.min(
+						baseReconnectDelay * Math.pow(2, reconnectAttempts - 1),
+						32000,
+					);
+					reconnectTimeout = setTimeout(() => {
+						connect();
+					}, delay);
+				}
 			}
 		};
 
